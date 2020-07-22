@@ -1,0 +1,13 @@
+---
+- name: "Install exporters for prometheus"
+  hosts: # Fill this line or write 'all'
+  gather_facts: False
+  become: True
+  remote_user: ansible
+  become_method: sudo
+  roles:
+    - common
+    - node_exporter
+    - apache_exporter 
+    - mysqld_exporter
+...

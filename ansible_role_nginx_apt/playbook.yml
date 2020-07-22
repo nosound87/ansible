@@ -1,0 +1,21 @@
+---
+- hosts: all
+  gather_facts: false
+  remote_user: "ansible"
+  become: True
+  become_method: sudo
+  handlers:
+    - include: handlers/main.yml
+  tasks:
+  - name: "Install Nginx"
+    apt:
+      name: nginx
+      state: latest
+  - name: "Remove default configuration"
+    file:
+      path: /etc/nginx/sites-enabled/default.conf 
+      state: absent
+  - name : "Check nginx configuration"
+    command: echo "checking..."
+    notify: validate nginx
+...

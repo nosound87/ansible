@@ -1,0 +1,24 @@
+---
+- hosts: all
+  gather_facts: False
+  remote_user: "ansible"
+  become: True
+  become_method: sudo
+  tasks:
+  - name: "Allow port 10050 for connection to zabbix_agent"
+    iptables:
+      chain: INPUT
+      action: insert
+      source: # You IP zabbix server 
+      protocol: tcp
+      destination_port: '10050'
+      ctstate: NEW,ESTABLISHED
+      jump: ACCEPT
+    become: yes
+  - name: "Install iptables-persistent package"
+    apt:
+      pkg:
+      - iptables-persistent
+      - fail2ban
+      state: latest
+

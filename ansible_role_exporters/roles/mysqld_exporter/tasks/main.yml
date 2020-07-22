@@ -1,0 +1,33 @@
+---
+- name: "Run script"
+  script: scripts/mysqld_exporter.sh 
+
+- name: "Create database user 'mysqld_exporter' using hashed password"
+  mysql_user:
+    name: mysqld_exporter
+    password: '*16FA365D56D80AEEFFB335B2C12FDC7C4401876B'
+    priv: "*.*:PROCESS,SELECT,GRANT"
+    state: present
+
+- name: "Configure database credentials"
+  template:
+    src: templates/.mysqld_exporter.cnf
+    dest: /etc/
+    backup: True
+
+- name: "Set ownership permissions"
+  command: chown root:mysqld_exporter /etc/.mysqld_exporter.cnf
+
+- name: "Add mysqld_exporter proxy_pass to exporters.conf"
+  lineinfile:
+    dest: /etc/nginx/conf.d/exporters.conf
+    line: "{{ item.line }}"
+    insertafter: "error_log"
+  with_items:
+    - {line: "proxy_pass      http://127.0.0.1:9104/metrics; }"}
+    - {line: "location /mysqld_exporter/metrics {"}
+    - {line: "#MYSQLD_EXPORTER"}
+    - {line: "\n"}
+  notify:
+    - start mysqld service 
+...

@@ -1,0 +1,39 @@
+---
+
+- name: "Install requirements for selinux python module"
+  script: scripts/python_module.sh
+
+- name: "Add 10100 port to firewalld"
+  firewalld:
+    port: 10100/tcp
+    permanent: yes
+    state: enabled
+    immediate: yes
+  notify:
+    - reload firewalld 
+
+- name: "Allow Nginx to listen on tcp port 10100"
+  seport:
+    ports: 10100
+    proto: tcp
+    setype: http_port_t
+    state: present
+
+- name: "Set httpd_can_network_connect flag on and keep it persistent across reboots"
+  seboolean:
+    name: httpd_can_network_connect
+    state: yes
+    persistent: yes
+ 
+- name: "Add general configuration file for exporters"
+  template:
+    src: templates/exporters.conf
+    dest: /etc/nginx/conf.d
+    backup: True  
+
+- name: "Check nginx configuration and restart service"
+  command: echo "checking..."
+  notify:
+    - validate nginx
+    - reload nginx
+...

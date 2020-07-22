@@ -1,0 +1,20 @@
+---
+- name: restart zabbix
+  service:
+    name: zabbix-agent
+    state: restarted
+
+- name: stop zabbix
+  service:
+    name: zabbix-agent
+    state: stoped
+
+- name: start zabbix
+  service:
+    name: zabbix-agent
+    state: started
+
+- name: enable zabbix
+  service:
+    name: zabbix-agent
+    enabled: yes

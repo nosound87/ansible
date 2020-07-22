@@ -1,0 +1,15 @@
+- name: restart httpd
+  service:
+    name: httpd
+    state: restarted
+
+- name: validate httpd
+  command: httpd -t
+  changed_when: False
+
+- name: reload httpd
+  service:
+    name: httpd
+    state: reloaded
+
+ 

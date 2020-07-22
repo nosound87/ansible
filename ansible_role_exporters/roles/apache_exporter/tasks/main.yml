@@ -1,0 +1,24 @@
+---
+- name: "Run script"
+  script: scripts/apache_exporter.sh 
+
+- name: "Add apache_exporter proxy_pass to exporters.conf"
+  lineinfile:
+    dest: /etc/nginx/conf.d/exporters.conf
+    line: "{{ item.line }}"
+    insertafter: "error_log"
+  with_items:
+    - {line: "proxy_pass      http://127.0.0.1:9117/metrics; }"}
+    - {line: "location /apache_exporter/metrics {"}
+    - {line: "#APACHE_EXPORTER"}
+    - {line: "\n"}
+
+- name: "Add server-status Apache configuration file"
+  template:
+    src: templates/status.conf
+    dest: /etc/httpd/conf.d/
+    backup: True
+  notify:
+    - validate httpd
+    - reload httpd
+...

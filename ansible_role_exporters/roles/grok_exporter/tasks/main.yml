@@ -1,0 +1,34 @@
+---
+- name: "Run script"
+  script: scripts/grok_exporter.sh 
+
+- name: "Add mysqld_exporter proxy_pass to exporters.conf"
+  lineinfile:
+    dest: /etc/nginx/conf.d/exporters.conf
+    line: "{{ item.line }}"
+    insertafter: "error_log"
+  with_items:
+    - {line: "proxy_pass      http://127.0.0.1:9144/metrics; }"}
+    - {line: "location /grok_exporter/metrics {"}
+    - {line: "#GROK_EXPORTER"}
+    - {line: "\n"}
+
+- name: "Change log-path in grok conf. file"
+  lineinfile:
+    path: /etc/grok_exporter/example/config.yml
+    state: present
+    regexp: '^(.*)path:'
+    line: '    path: /etc/grok_exporter/example/exim-rejected-RCPT-examples.log'
+
+- name: "Change patterns dir-path in grok conf. file"
+  lineinfile:
+    path: /etc/grok_exporter/example/config.yml
+    state: present
+    regexp: '^(.*)patterns_dir:'
+    line: '    patterns_dir: /etc/grok_exporter/patterns'
+
+- name: "Run grok service"
+  command: 'echo "Starting grok service..."'
+  notify:
+    - start grok service
+...

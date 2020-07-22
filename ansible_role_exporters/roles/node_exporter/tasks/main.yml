@@ -1,0 +1,15 @@
+---
+- name: "Run script"
+  script: scripts/node_exporter.sh 
+
+- name: "Add node_exporter proxy_pass to exporters.conf"
+  lineinfile:
+    dest: /etc/nginx/conf.d/exporters.conf
+    line: "{{ item.line }}"
+    insertafter: "error_log"
+  with_items:
+    - {line: "proxy_pass      http://127.0.0.1:9100/metrics; }"}
+    - {line: "location /node_exporter/metrics {"}
+    - {line: "#NODE_EXPORTER"}
+    - {line: "\n"}
+...

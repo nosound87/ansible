@@ -1,0 +1,6 @@
+---
+- name: "start grok service"
+  service:
+    name: grok_exporter.service
+    state: started
+...

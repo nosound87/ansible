@@ -1,0 +1,26 @@
+---
+- hosts: all
+  gather_facts: false
+  remote_user: "ansible"
+  become: True
+  become_method: sudo
+  handlers:
+    - include: handlers/main.yml
+  tasks:
+  - name: "Install Nginx"
+    yum:
+      name: nginx
+      state: latest
+  - name: "Remove defualt nginx configuration"
+    file:
+      path: /etc/nginx/nginx.conf
+      state: absent
+  - name: "Add general nginx config from template"
+    template:
+      src: templates/nginx.conf
+      dest: /etc/nginx/
+      backup: True
+  - name : "Check nginx configuration"
+    command: echo "checking..."
+    notify: validate nginx
+...

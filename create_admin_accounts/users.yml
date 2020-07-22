@@ -1,0 +1,42 @@
+---
+- hosts: all
+  gather_facts: false
+  remote_user: "ansible"
+  become: "yes"
+  become_method: "sudo"
+  vars:
+    users:
+    - username: "john" # user_name
+      groups: "administrator" # user_group (i.e. see group name below)
+  tasks:
+  - name: "Add new group for admins"
+    group:
+      name: "administrator" # group_name
+      state: "present"
+  - name: "Add user accounts"
+    user:
+      name: "{{ item.username }}"
+      shell: '/bin/bash'
+      groups: "{{ item.groups }}"
+    with_items: "{{ users }}"
+  - name: "Add authorized keys"
+    authorized_key:
+      user: "{{ item.username }}"
+      key: "{{ lookup('file', 'files/'+ item.username + '.pub.key') }}"
+    with_items: "{{ users }}"
+  - name: "Add new group to sudoers file"
+      lineinfile:
+        path: "/etc/sudoers"
+        regexp: '^administrator'
+        line: '%administrator ALL=(ALL) NOPASSWD: ALL'
+        validate: 'visudo -cf %s'
+        # You can also adding some specific user with his static password and with specific home directory (in this exp: mkpasswd --method=sha-512 to encrypt user password)
+   - name: "Add static user"
+     user:
+       name: "some_user" 
+       state: "present"
+       createhome: yes
+       home: '/homesystem'
+       shell: '/bin/bash'
+       password: '$6$/eGHHlb2v7W$PFVVtj1JXLtDmh8IelgMHZo1L6sLSEXG.MJ8sALoE9rXsXhtXfbRK2oDTe.OlqKNeLCU2fIA4zxN8sJ4oiFT20' # some testpassword's hash
+...

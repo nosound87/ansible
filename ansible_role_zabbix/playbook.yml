@@ -1,0 +1,49 @@
+---
+- hosts: all
+  gather_facts: False
+  remote_user: "ansible"
+  become: True
+  become_method: sudo
+  handlers:
+    - include: handlers/main.yml
+  tasks:
+  - name: "Install zabbix agent"
+    script: scripts/install.sh
+# Uncomment this if you have had problems with SELinux
+# - name: "Change the httpd_t domain to permissive"
+#   selinux_permissive:
+#     name: zabbix_agent_t
+#     permissive: true
+  - name: "Change zabbix-agent configuration"
+    lineinfile:
+      path: /etc/zabbix/zabbix_agentd.conf
+      regexp: "{{ item.regexp }}"
+      line: "{{ item.line }}"
+    with_items:
+      - { regexp: '^# EnableRemoteCommands=', line: 'EnableRemoteCommands=1' }
+      - { regexp: '^# LogRemoteCommands=', line: 'LogRemoteCommands=1' }
+      # set server's ip address
+      - { regexp: '^Server=', line: 'Server=<IPAddress>' }
+      - { regexp: '^# ListenPort=', line: 'ListenPort=10050' }
+      # set server's ip address
+      - { regexp: '^ServerActive=', line: 'ServerActive=<IPAddress>' }
+      - { regexp: '^Hostname=', line: '#Hostname=' }
+      - { regexp: '^# HostnameItem=system.hostname', line: 'HostnameItem=system.hostname' }
+    notify:
+      - start zabbix
+      - enable zabbix
+  - name: "Allow port access on agent_host 10050 in iptables"
+    iptables:
+      chain: INPUT
+      action: insert
+      # Set correct IP Zabbix Server address on the line below
+      source: 0.0.0.0
+      protocol: tcp
+      destination_port: '10050'
+      ctstate: NEW,ESTABLISHED
+      jump: ACCEPT
+    become: yes
+    notify:
+      - restart zabbix
+...
+

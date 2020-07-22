@@ -1,0 +1,7 @@
+---
+- name: "start mysqld service"
+  service:
+    name: mysqld_exporter.service
+    state: started
+
+...

@@ -1,0 +1,15 @@
+---
+- name: restart nginx
+  service:
+    name: nginx
+    state: restarted
+
+- name: validate nginx
+  command: nginx -t
+  changed_when: false
+
+- name: reload nginx
+  service:
+    name: nginx
+    state: reloaded
+...
