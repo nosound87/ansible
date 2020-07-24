@@ -1,4 +1,4 @@
-# Some simple playbooks to automation my task.
+# Some simple playbooks to automating various tasks
 
 ### ansible_role_exporters
 There are some useful roles contain few exporters for Prometheus:
