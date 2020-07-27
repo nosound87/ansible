@@ -7,8 +7,8 @@ There are some useful roles contain few exporters for Prometheus:
 - mysqld_exporter
 - grok_exporter (experimental)
 
-```All roles have a common task. Add proxy_pass to exporters.conf webserver file (NGiNX) to serve metrics, sth like this:
-
+All roles have a common task. Add proxy_pass to exporters.conf webserver file (NGiNX) to serve metrics, sth like this:
+```
 #APACHE_EXPORTER
 location /apache_exporter/metrics {
 proxy_pass      http://127.0.0.1:9117/metrics; }
