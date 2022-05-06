@@ -1,5 +1,4 @@
 ---
-
   - name: Disable swap and remove it from fstab
     mount:
       name: "{{ item }}"
