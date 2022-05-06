@@ -1,5 +1,4 @@
 ---
-
   - name: Copy join command from Ansiblehost to the worker nodes
     copy:
       src: /tmp/kubernetes_join_command
