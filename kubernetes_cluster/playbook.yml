@@ -1,0 +1,13 @@
+- name: Install Kubernetes Cluster
+  hosts: nodes
+  gather_facts: false
+  remote_user: "ansible"
+  become: true
+  become_method: "sudo"
+  roles:
+  #  - common
+  #  - swapoff
+  #  - fqdn
+  #  - kubeinstall
+  #  - kubeinitial
+    - kubejoin

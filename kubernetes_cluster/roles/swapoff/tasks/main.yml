@@ -1,0 +1,13 @@
+---
+
+  - name: Disable swap and remove it from fstab
+    mount:
+      name: "{{ item }}"
+      fstype: swap
+      state: absent
+    with_items:
+      - swap
+      - none
+  - name: Disable SWAP
+    command: swapoff -a
+...

@@ -1,0 +1,52 @@
+---  
+  - name: Add an apt signing key for Kubernetes
+    apt_key:
+      url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+      state: present
+
+  - name: Adding apt repository for Kubernetes
+    apt_repository:
+      repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+      state: present
+      filename: kubernetes.list
+
+  - name: Install Kubernetes binaries
+    apt: 
+      name: "{{ packages }}"
+      state: present
+      update_cache: yes
+    vars:
+      packages:
+        - kubelet 
+        - kubeadm 
+        - kubectl
+
+  - name: Prevent kubelet from being upgraded
+    dpkg_selections:
+      name: kubelet
+      selection: hold
+
+  - name: Prevent kubeadm from being upgraded
+    dpkg_selections:
+      name: kubeadm
+      selection: hold
+
+  - name: Prevent kubectl from being upgraded
+    dpkg_selections:
+      name: kubectl
+      selection: hold
+
+        #  - name: Restart Containerd Service
+        #service:
+        #name: containerd
+        #state: restarted
+
+  - name: Pulling images required for setting up a Kubernetes cluster
+    shell: kubeadm config images pull
+
+  - name: Restarting kubelet service
+    service:
+      name: kubelet
+      daemon_reload: yes
+      state: restarted
+...

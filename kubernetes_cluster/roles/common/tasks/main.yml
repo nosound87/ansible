@@ -1,0 +1,70 @@
+---
+  - name: Install packages that allow apt to be used over HTTPS
+    apt:
+      name: "{{ packages }}"
+      state: present
+      update_cache: yes
+    vars:
+      packages:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg
+      - software-properties-common
+      - lsb-release
+      - bash-completion
+
+  - name: Add an apt signing key for Docker
+    apt_key:
+      url: https://download.docker.com/linux/debian/gpg
+      state: present
+
+  - name: Add apt repository for stable version
+    apt_repository:
+      repo: deb [arch=amd64] https://download.docker.com/linux/debian bullseye stable
+      state: present
+
+  - name: Configure prerequisites - step 1/5
+    ansible.builtin.template:
+      src: templates/containerd.conf
+      dest: /etc/modules-load.d/containerd.conf
+  
+  - name: Configure prerequisites - step 2/5
+    modprobe:
+      name: overlay
+      state: present
+
+  - name: Configure prerequisites - step 3/5
+    modprobe:
+      name: br_netfilter
+      state: present
+
+  - name: Configure prerequisites - step 4/5
+    ansible.builtin.template:
+      src: templates/kubernetes-cri.conf
+      dest: /etc/sysctl.d/99-kubernetes-cri.conf
+
+  - name: Configure prerequisites - step 5/5
+    shell: sysctl --system 
+
+  - name: Install Containerd
+    apt: 
+      name: containerd.io
+      state: present
+      update_cache: yes
+
+  - name: Prepare Containerd configuration - step 1/2
+    shell: containerd config default | sudo tee /etc/containerd/config.toml
+
+  - name: Prepare Containerd configuration - step 2/2
+    replace:
+      path: /etc/containerd/config.toml
+      regexp: '^(\s*SystemdCgroup = )false$'
+      replace: '\g<1>true'  
+
+  - name: Restart Containerd Service
+    service:
+      name: containerd
+      state: restarted
+
+...
