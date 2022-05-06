@@ -36,11 +36,6 @@
       name: kubectl
       selection: hold
 
-        #  - name: Restart Containerd Service
-        #service:
-        #name: containerd
-        #state: restarted
-
   - name: Pulling images required for setting up a Kubernetes cluster
     shell: kubeadm config images pull
 
