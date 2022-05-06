@@ -1,5 +1,4 @@
 ---
-
   - name: Define FQDN hosts
     ansible.builtin.template:
       src: templates/hosts_list
