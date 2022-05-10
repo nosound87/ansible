@@ -1,5 +1,5 @@
 - name: Install Kubernetes Cluster
-  hosts: nodes
+  hosts: master, nodes
   gather_facts: false
   remote_user: "ansible"
   become: true
@@ -10,4 +10,4 @@
   #  - fqdn
   #  - kubeinstall
   #  - kubeinitial
-    - kubejoin
+  #  - kubejoin
